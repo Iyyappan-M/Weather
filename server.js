@@ -16,7 +16,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGO_URI;
@@ -53,7 +53,7 @@ app.use('/api/user', userRoutes);
 
 // Route handlers with error catching
 const serveFile = (fileName) => (req, res) => {
-    const filePath = path.join(__dirname, 'public', fileName);
+    const filePath = path.join(__dirname, fileName);
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error(`Error sending ${fileName}:`, err);
