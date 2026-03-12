@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast | Modern Weather Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page">
+    <!-- Animated Environment Layers -->
+    <div class="background-container" id="bg-container"></div>
+    <div id="star-container" class="animation-layer hidden"></div>
+    <div id="cloud-container" class="animation-layer hidden"></div>
+    <div id="rain-container" class="animation-layer hidden"></div>
+    <div id="rainbow-overlay" class="animation-layer rainbow-overlay hidden"></div>
+
+    <!-- Initial Loading Screen -->
+    <div id="initial-loader" class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar glass">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-cloud-sun"></i>
+            <span>SkyCast</span>
+        </div>
+        
+        <div class="sidebar-profile">
+            <div class="avatar-container">
+                <div class="avatar-glow"></div>
+                <img src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" id="user-avatar" alt="Avatar">
+            </div>
+            <div class="profile-info">
+                <h4 id="sidebar-name">Fetching...</h4>
+                <p id="sidebar-location"><i class="fa-solid fa-location-dot"></i> --, --</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul id="main-nav">
+                <li class="active" data-section="home">
+                    <a href="javascript:void(0)" class="ripple-target">
+                        <i class="fa-solid fa-house"></i> <span>Home</span>
+                    </a>
+                </li>
+                <li data-section="weather">
+                    <a href="javascript:void(0)" class="ripple-target">
+                        <i class="fa-solid fa-wind"></i> <span>Weather Details</span>
+                    </a>
+                </li>
+                <li data-section="profile">
+                    <a href="javascript:void(0)" class="ripple-target">
+                        <i class="fa-solid fa-id-card-clip"></i> <span>Profile</span>
+                    </a>
+                </li>
+                <li data-section="game">
+                    <a href="javascript:void(0)" class="ripple-target">
+                        <i class="fa-solid fa-gamepad"></i> <span>Sky Game 🎮</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button id="logout-btn" class="logout-btn ripple-target">
+                <i class="fa-solid fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Navigation -->
+        <header class="top-nav glass">
+            <div class="welcome-msg">
+                <h2 id="welcome-user">Welcome Back!</h2>
+                <div class="date-time">
+                    <span id="current-date">--</span> | <span id="current-time">00:00</span>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="city-input" placeholder="Search for cities...">
+                    <button id="location-btn" title="Use Current Location" class="action-icon-btn">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </button>
+                </div>
+                <!-- Suggestions will be injected here -->
+                <div id="search-suggestions" class="search-suggestions hidden"></div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Sections -->
+        <div id="pages-container">
+            <!-- Home Section -->
+            <section id="home-section" class="page-section fade-in">
+                <div class="dashboard-grid">
+                    <!-- Large Weather Hero Card -->
+                    <div class="main-weather-card glass">
+                        <div class="weather-header">
+                            <div class="location-info">
+                                <h1 id="display-city">--</h1>
+                                <p id="weather-description">--</p>
+                            </div>
+                            <div class="weather-visual">
+                                <img id="weather-icon" src="" alt="Icon" class="weather-icon-large">
+                            </div>
+                        </div>
+                        <div class="weather-main">
+                            <h2 class="temp-large" id="temperature">--°</h2>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Extra Panels -->
+                    <div class="right-sidebar">
+                        <div class="small-card glass">
+                            <h3><i class="fa-solid fa-sun"></i> UV Index</h3>
+                            <div class="uv-meter">
+                                <div id="uv-progress" class="uv-progress"></div>
+                            </div>
+                            <p id="uv-text">Loading Index...</p>
+                        </div>
+                        <div class="small-card glass">
+                            <h3><i class="fa-solid fa-lightbulb"></i> Travel Tip</h3>
+                            <p id="weather-tip">Loading daily suggestion based on local weather...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="weather-details-grid" style="margin-top: 20px;">
+                    <div class="detail-card glass">
+                        <i class="fa-solid fa-droplet"></i>
+                        <span id="humidity">--%</span>
+                        <p>Humidity</p>
+                    </div>
+                    <div class="detail-card glass">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span id="pressure">-- hPa</span>
+                        <p>Air Pressure</p>
+                    </div>
+                    <div class="detail-card glass">
+                        <i class="fa-solid fa-temperature-three-quarters"></i>
+                        <span id="feels-like">--°</span>
+                        <p>Feels Like</p>
+                    </div>
+                    <div class="detail-card glass">
+                        <i class="fa-solid fa-wind"></i>
+                        <span id="wind-speed">-- km/h</span>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="page-section hidden">
+                <div class="profile-card glass">
+                    <div class="profile-hero">
+                        <img src="" id="profile-display-avatar" alt="Avatar" class="profile-hero-avatar">
+                        <div class="profile-hero-info">
+                            <h2 id="profile-display-name">--</h2>
+                            <p id="profile-display-location"><i class="fa-solid fa-map-marker-alt"></i> --, --</p>
+                        </div>
+                    </div>
+                    
+                    <form id="update-profile-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="update-name" class="form-input" placeholder="e.g. John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred City</label>
+                                <input type="text" id="update-city" class="form-input" placeholder="e.g. Paris">
+                            </div>
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" id="update-country" class="form-input" placeholder="e.g. France">
+                            </div>
+                        </div>
+                        <button type="submit" class="premium-btn ripple-target">
+                            Save Changes <i class="fa-solid fa-circle-check"></i>
+                        </button>
+                    </form>
+                    <div id="profile-status" class="status-msg hidden"></div>
+                </div>
+            </section>
+
+            <!-- Sky Catch Game Section -->
+            <section id="game-section" class="page-section hidden">
+                <div class="game-card glass">
+                    <div class="game-header">
+                        <div class="game-title">
+                            <h3><i class="fa-solid fa-cloud-bolt"></i> Sky Catch</h3>
+                        </div>
+                        <div class="game-stats-container">
+                            <div class="game-score-badge best">
+                                <span class="score-label">Best</span>
+                                <span id="game-best-val" class="score-value">0</span>
+                            </div>
+                            <div class="game-score-badge">
+                                <span class="score-label">Points</span>
+                                <span id="game-score-val" class="score-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="game-area" class="game-area">
+                        <!-- Animated Environment Layers -->
+                        <div class="game-bg-elements">
+                            <div class="bg-game-rainbow"></div>
+                            <!-- Stars will be injected here -->
+                        </div>
+                        
+                        <!-- The Catcher -->
+                        <div id="game-catcher" class="game-catcher">
+                            <div class="catcher-visual">
+                                <div class="cloud-character">☁️</div>
+                            </div>
+                        </div>
+
+                        <!-- Game Over Screen Modal -->
+                        <div id="game-over-screen" class="game-over-overlay hidden">
+                            <div class="game-over-modal glass">
+                                <i class="fa-solid fa-skull-crossbones skull-glow"></i>
+                                <h2>CRASHED!</h2>
+                                <div class="final-score-display">
+                                    <p>Your Final Score</p>
+                                    <h1 id="final-score">0</h1>
+                                    <p class="best-score-hint">Record: <span id="final-best-score">0</span></p>
+                                </div>
+                                <div class="modal-actions">
+                                    <button id="restart-game-btn" class="modal-btn primary-btn ripple-target">
+                                        <i class="fa-solid fa-rotate-right"></i> Play Again
+                                    </button>
+                                    <button id="back-to-dash-btn" class="modal-btn secondary-btn ripple-target">
+                                        <i class="fa-solid fa-house"></i> Home
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-footer">
+                        <div class="hint-box desktop">
+                            <span class="key-cap"><i class="fa-solid fa-arrow-left"></i></span>
+                            <span class="key-cap"><i class="fa-solid fa-arrow-right"></i></span>
+                            <span>Move Cloud</span>
+                        </div>
+                        <div class="hint-box mobile">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                            <span>Drag to move</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

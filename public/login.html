@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast | Login</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Restoring Previous Styles for Login Specifically */
+        .auth-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        .auth-card {
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .auth-header { margin-bottom: 2.5rem; }
+        .logo {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; font-size: 2rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+        }
+        .auth-header h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+        .auth-header p { color: var(--text-muted); font-size: 0.95rem; }
+        .input-group {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 1.25rem; border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .input-group:focus-within {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .input-group i { color: var(--text-muted); }
+        .input-group input {
+            background: transparent; border: none; outline: none;
+            color: white; width: 100%; font-size: 1rem;
+        }
+        .auth-footer { margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .error-text { color: var(--danger); margin-top: 1rem; font-size: 0.85rem; }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="background-container"></div>
+    <main class="auth-container">
+        <div class="auth-card glass">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                    <span>SkyCast</span>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Login to your premium dashboard</p>
+            </div>
+            <form id="login-form">
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="premium-btn">Login <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+            </div>
+            <div id="error-msg" class="error-text hidden"></div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.isProfileComplete) {
+                        window.location.href = '/dashboard';
+                    } else {
+                        window.location.href = '/profile-setup';
+                    }
+                } else {
+                    errorMsg.innerText = data.message;
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
